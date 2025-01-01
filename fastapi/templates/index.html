@@ -6,7 +6,14 @@
     <link href="{{ url_for('static', path='/output.css') }}" rel="stylesheet">
 </head>
 <body>
-    <button class="bg-red-500">Test</button>
+    <div class="w-screen h-screen bg-slate-500">
+        <div class="flex w-screen justfy-center items-center">
+            <form method="post" action="/search">
+                <label for="search_query">Search</label>
+                <input name="search_query" />
+            </form>
+        </div>
+    </div>
 {{id}}
 </body>
 </html>

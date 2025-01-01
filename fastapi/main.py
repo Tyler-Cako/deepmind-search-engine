@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -14,3 +14,7 @@ def read_root(request: Request):
     return templates.TemplateResponse(
         request=request, name="index.html", context={"id": "12345"}
     )
+
+@app.post("/search")
+async def search(search_query: str = Form()):
+    return (f"search_query: {search_query}")
