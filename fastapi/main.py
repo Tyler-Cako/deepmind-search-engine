@@ -9,6 +9,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse(
@@ -18,3 +19,8 @@ def read_root(request: Request):
 @app.post("/search")
 async def search(search_query: str = Form()):
     return (f"search_query: {search_query}")
+
+# @app.post("/scrape")
+
+
+# On timer, re-run webscraper
