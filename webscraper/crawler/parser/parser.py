@@ -1,18 +1,23 @@
 from html.parser import HTMLParser
 from urllib.request import urlopen
 from typing import List
+from .util import appendUrl
 
 class HTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         """Handle <a> tags to continue crawling"""
-
+        if tag == "a":
+            for key, value in attrs:
+                if key == "href":
+                    new_url = appendUrl(self.root_url, value) #Make relative url absolute
+                    print(new_url)
+                    self.url_list.append(new_url)
 
     def parse(self, url: str) -> List[str]:
         """Parse a given URL's page. Returns list of links to crawl next"""
 
-        print("test")
-
         self.url_list = []
+        self.root_url = url
 
         try:
             print("Enter HTMLParser: run")
@@ -22,15 +27,16 @@ class HTMLParser(HTMLParser):
             # First check if charset is utf8
             content_charset = response.headers.get_content_charset()
 
-            if content_charset != "utf8":
+            if content_charset != "utf-8":
                 raise Exception("HTMLParser parse error. Page not in utf8 encoding!")
 
             responseHtml = response.read().decode('utf8')
             if responseHtml:
                 print("Page received.")
                 self.feed(responseHtml)
-        except Exception as inst:
-            print(f"parsing error: {inst}")
+        except Exception as e:
+            print(f"Parsing error: {e}")
 
 
         return self.url_list
+
