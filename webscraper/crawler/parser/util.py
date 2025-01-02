@@ -1,8 +1,5 @@
 from urllib.parse import urlparse
-
-def appendUrl(root: str, url: str) -> str:
-    """Makes relative path absolute"""
-    return (root + url).rstrip()
+import re
 
 def cleanUrl(url: str) -> str:
     """
@@ -29,7 +26,7 @@ def cleanUrl(url: str) -> str:
 
     return url.rstrip()
 
-def getRootUrl(url: str) -> str:
+def getHostName(url: str) -> str:
     """
         Given url, return the hostname
 
@@ -38,16 +35,49 @@ def getRootUrl(url: str) -> str:
         Returns:
             hostname(str)
     """
-    parsed_url = urlparse(url)
+    # parsed_url = urlparse(url)
 
-    print(parsed_url)
+    # hostname = parsed_url.hostname
+    # scheme = parsed_url.scheme
 
-    hostname = parsed_url.hostname
-    scheme = parsed_url.scheme
-
-    if not scheme:
-        scheme = "http"
+    # if not scheme:
+    #     scheme = "http"
     
-    rooturl = scheme + "://" + hostname
+    # rooturl = scheme + "://" + hostname
 
-    return rooturl.rstrip()
+    # return rooturl.rstrip()
+    return urlparse(url).hostname
+
+def isValid(url: str, hostname: str) -> bool:
+    """
+        Checks if a URL is valid. a valid URL meets the following parameters:
+            1. Starts with http(s)://
+            2. Contains hostname in URL
+            3. Contains a paper
+        
+        Args:
+            url(str): input URL
+            hostname(str): expected hostname
+        
+        Returns:
+            isValid boolean  
+    """
+
+    if url[0:4] != "http":
+        print("http not found in URL")
+        return False
+    
+    if not url.find(hostname):
+        print("hostname not found in URL")
+        return False
+    
+    return True
+
+def isPaper(url: str) -> bool:
+    """
+        Checks URL: to see if it is a paper or not
+    """
+    if re.search("(paper[/])|(publications[/])", url):
+        return True
+
+    return False
