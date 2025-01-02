@@ -7,7 +7,7 @@ class Crawler(object):
 
     def __init__(self):
         self.to_visit = []
-        self.visited = set()
+        self.visited = set([])
         self.parser = HTMLParser()
         self.robotParser = robotparser.RobotFileParser()
 
@@ -38,13 +38,14 @@ class Crawler(object):
 
         # Parse URL
         url_list = self.parser.parse(url) # New URLs to crawl
-        print(url_list)
 
         self.visited.add(url)
 
         if counter > 0:
             for url in url_list:
-                self.crawlUrl(url, counter - 1)
+                print(f"url: {url} \nself.visited: {self.visited}")
+                if url not in self.visited:
+                    self.crawlUrl(url, counter - 1)
 
     def canCrawl(self, url: str) -> bool:
         """Check Robots.txt to see if we can crawl this URL"""

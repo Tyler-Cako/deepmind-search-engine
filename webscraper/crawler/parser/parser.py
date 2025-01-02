@@ -1,7 +1,7 @@
 from html.parser import HTMLParser
 from urllib.request import urlopen
 from typing import List
-from .util import appendUrl
+from .util import appendUrl, cleanUrl, getRootUrl
 
 class HTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
@@ -10,14 +10,17 @@ class HTMLParser(HTMLParser):
             for key, value in attrs:
                 if key == "href":
                     new_url = appendUrl(self.root_url, value) #Make relative url absolute
-                    print(new_url)
-                    self.url_list.append(new_url)
+                    formatted_url = cleanUrl(new_url)
+                    self.url_list.append(formatted_url)
 
     def parse(self, url: str) -> List[str]:
         """Parse a given URL's page. Returns list of links to crawl next"""
 
         self.url_list = []
-        self.root_url = url
+        self.root_url = getRootUrl(url)
+        self.error_urls = []
+
+        print(self.root_url)
 
         try:
             print("Enter HTMLParser: run")
@@ -35,8 +38,7 @@ class HTMLParser(HTMLParser):
                 print("Page received.")
                 self.feed(responseHtml)
         except Exception as e:
-            print(f"Parsing error: {e}")
+            print(f"Parsing error from url({url}): {e}")
 
-
-        return self.url_list
+        return self.url_list, self.error_urls
 
