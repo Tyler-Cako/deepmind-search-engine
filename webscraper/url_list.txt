@@ -1,2 +1,1 @@
 https://deepmind.google/research/publications/
-https://allenai.org/papers
