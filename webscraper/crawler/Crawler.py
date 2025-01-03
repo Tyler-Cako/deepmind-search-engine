@@ -1,58 +1,44 @@
-from urllib import request, robotparser
-from urllib.parse import urlparse
-from .parser.parser import HTMLParser
+import asyncio
+
+import httpx
+from .parser import parse
+
+
 
 class Crawler(object):
-    """Crawler object with various methods to crawl the web based on document of seed URLs."""
-
     def __init__(self):
-        self.to_visit = []
-        self.visited = set()
-        self.parser = HTMLParser()
-        self.robotParser = robotparser.RobotFileParser()
+        self.papers = [] # List of papers found when crawling
+        self.visited = set([]) # Set of visited URLs for traversal
+        self.error_list = [] # List of URLs that were not parse-able
 
-    def crawl(self, path: str) -> None:
+    async def run(self, path: str) -> None:
         """Start URL crawling given file path to a list of urls"""
 
-        # file = open(path)
         with open(path) as file:
 
             url = file.readline()
             # Read list of files from txt document
             while url:
                 print(f"url: {url}")
-                self.crawlUrl(url, 10)
+                task = asyncio.create_task(self.crawlUrl(url.rstrip(), 10))
+                await task
                 url = file.readline()
 
-        # file.close()
-
-    def crawlUrl(self, url: str, counter: int) -> None:
-        """Crawl a specific URL. Counter designates max depth of search"""
-
+    async def crawlUrl(self, url: str, counter: int) -> None:
         if url in self.visited:
             return
+        
+        async with httpx.AsyncClient() as client:
+            self.visited.append(url)
+            response = await client.get(url)
+            responseHtml = response.text
+            url_list, isPaper, error_list = parse(responseHtml)
 
-        # Check robots.txt
-        if not self.canCrawl(url):
-            return
+            self.error_list.append(error_list)
 
-        # Parse URL
-        url_list = self.parser.parse(url) # New URLs to crawl
-        print(url_list)
+            if isPaper:
+                self.papers.append(responseHtml)
 
-        self.visited.add(url)
-
-        if counter > 0:
             for url in url_list:
-                self.crawlUrl(url, counter - 1)
-
-    def canCrawl(self, url: str) -> bool:
-        """Check Robots.txt to see if we can crawl this URL"""
-
-        print("enter canCrawl")
-        can_fetch = self.robotParser.can_fetch("*", url)
-        print(can_fetch)
-        return True
-        # root_url = urlparse(url).hostname
-        # robot_url = root_url + "/robots.txt"
-        # self.robotParser.set_url(robot_url)
+                task = asyncio.create_task(self.crawlUrl(url, counter - 1))
+                await task

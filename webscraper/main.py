@@ -1,5 +1,9 @@
 from crawler.Crawler import Crawler
+import asyncio
 
 crawler = Crawler()
 
-crawler.crawl("url_list.txt")
+async def main():
+    await crawler.run("url_list.txt")
+
+asyncio.run(main())
