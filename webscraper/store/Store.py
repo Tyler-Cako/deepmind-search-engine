@@ -1,6 +1,7 @@
 import sqlite3
 from typing import Dict
 
+
 class Store(object):
     def __init__(self):
         self.con = sqlite3.connect("crawled.db")
