@@ -35,7 +35,7 @@ class DeepMindSpider(scrapy.Spider):
         5. Checks for a pagination link to the next page and follows it if present.
         """
         logging.info(f"Parsing URL: {response.url}")
-        
+
         if not response:
             logging.error("Failed to retrieve the response")
 
@@ -102,7 +102,7 @@ class DeepMindSpider(scrapy.Spider):
         item["title"] = title.strip() if title else "No Title"
         item["abstract"] = abstract
         item["url"] = pub_url  # The detail-page URL on the DeepMind site
-        
+
         logging.info(f"Scraped item: {item}")
 
         yield item
